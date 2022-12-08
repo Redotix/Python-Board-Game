@@ -6,6 +6,7 @@ class PlayField:
     def __init__(self, fieldcolor, inputfield):
         self.playingFieldVar = inputfield
         self.color = fieldcolor
+        self.fieldTiles = []
         for i in range(len(self.playingFieldVar)):
             tile = self.Tile(i, self.playingFieldVar[i])
             self.fieldTiles.append(tile)

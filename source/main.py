@@ -22,18 +22,17 @@ playingField = PlayField("white",
 # Variables that define the players and their team color, ending house coordinates, starting house coordinates
 # starting PlayField tile, ending PlayField tile and the color of the piece.
 Player1 = Player("darkBlue", [(6, 2), (6, 3), (6, 4), (6, 5), ],
-                 [(10, 1), (11, 1), (10, 2), (11, 2), ], 0, 39, "blue")
+                 [(10, 1), (11, 1), (10, 2), (11, 2), ], 0, 39, "blue", 4)
 Player2 = Player("gold", [(6, 10), (6, 9), (6, 8), (6, 7), ],
-                 [(1, 10), (1, 11), (2, 10), (2, 11), ], 20, 19, "yellow")
+                 [(1, 10), (1, 11), (2, 10), (2, 11), ], 20, 19, "yellow", 4)
 Player3 = Player("darkGreen", [(10, 6), (9, 6), (8, 6), (7, 6), ],
-                 [(10, 10), (10, 11), (11, 10), (11, 11), ], 10, 9, "green")
+                 [(10, 10), (10, 11), (11, 10), (11, 11), ], 10, 9, "green", 4)
 Player4 = Player("maroon", [(2, 6), (3, 6), (4, 6), (5, 6), ],
-                 [(1, 1), (1, 2), (2, 1), (2, 2), ], 30, 29, "red")
+                 [(1, 1), (1, 2), (2, 1), (2, 2), ], 30, 29, "red", 4)
 
 players = [Player1, Player2, Player3, Player4]
 
 for player in range(len(players)):
-    players[player].definepieces(4)
     for piece in range(len(players[player].playerPieces)):
         players[player].playerPieces[piece].placepiece(players[player].startCoords[piece])
 
