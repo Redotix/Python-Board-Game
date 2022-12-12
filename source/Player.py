@@ -1,5 +1,4 @@
-import turtle as t
-from offsetfunc import *
+from Piece import *
 
 
 class Player:
@@ -20,27 +19,6 @@ class Player:
         self.pieceColor = piececolor
         self.playerPieces = []
         for i in range(pieceamount):
-            piece = self.Piece(self.pieceColor)
+            piece = Piece(self.pieceColor)
             self.playerPieces.append(piece)
 
-    class Piece:
-        position = None
-        uniqueTurt = None
-
-        def __init__(self, piececolor):
-            self.uniqueTurt = t.Turtle()
-
-            self.uniqueTurt.shape("circle")
-            self.uniqueTurt.color(piececolor)
-            self.uniqueTurt.turtlesize(1.5, 1.5)
-            self.uniqueTurt.penup()
-
-        def placepiece(self, position):
-            self.uniqueTurt.speed(0)
-            self.uniqueTurt.setpos(offsettocenter(position))
-            self.uniqueTurt.speed(3)
-            self.position = position
-
-        # Moves the piece to the input coordinate tuple.
-        def movepiece(self, coords):
-            self.uniqueTurt.setpos(offsettocenter(coords))

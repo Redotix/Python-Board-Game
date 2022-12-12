@@ -1,3 +1,6 @@
+from Tile import *
+
+
 class PlayField:
     fieldTiles = []
     canvassize = (5, 5)
@@ -21,44 +24,32 @@ class PlayField:
         self.dotsize = self.maxdotsize / (canvassize / 7)
         self.canvassize = (canvassize, canvassize)
         center = (canvassize / 2) - 0.5
+        rightlist = []
+        leftlist = []
 
-        # Creating the 4 inner corners of the playing field.
-        self.fieldTiles.append((center + 1, center + 1))
-        self.fieldTiles.append((center - 1, center + 1))
-        self.fieldTiles.append((center + 1, center - 1))
-        self.fieldTiles.append((center - 1, center - 1))
+        for x in range(2 + extratiles):
+            rightlist.append((center + 1, center + 2 + extratiles - x))
+            leftlist.append((center - 1, center - 2 - extratiles + x))
 
-        # creating extra tiles from the 4 inner corners and extending them outwards.
         for x in range(1 + extratiles):
-            self.fieldTiles.append((center + 2 + x, center + 1))
-            self.fieldTiles.append((center - 2 - x, center - 1))
+            rightlist.append((center + 2 + x, center + 1))
+            leftlist.append((center - 2 - x, center - 1))
 
-            self.fieldTiles.append((center + 2 + x, center - 1))
-            self.fieldTiles.append((center - 2 - x, center + 1))
+        rightlist.append((center + 2 + extratiles, center))
+        leftlist.append((center - 2 - extratiles, center))
 
-        for y in range(1 + extratiles):
-            self.fieldTiles.append((center + 1,  center - 2 - y))
-            self.fieldTiles.append((center - 1, center + 2 + y))
+        for x in range(2 + extratiles):
+            rightlist.append((center + 2 + extratiles - x, center - 1))
+            leftlist.append((center - 2 - extratiles + x, center + 1))
 
-            self.fieldTiles.append((center - 1, center - 2 - y))
-            self.fieldTiles.append((center + 1, center + 2 + y))
+        for x in range(1 + extratiles):
+            rightlist.append((center + 1, center - 2 - x))
+            leftlist.append((center - 1, center + 2 + x))
 
-        # Adding last 4 outer tiles to close off the track loop
-        self.fieldTiles.append((center + extratiles + 2, center))
-        self.fieldTiles.append((center - extratiles - 2, center))
-        self.fieldTiles.append((center, center + extratiles + 2))
-        self.fieldTiles.append((center, center - extratiles - 2))
+        rightlist.append((center, center - 2 - extratiles))
+        leftlist.append((center, center + 2 + extratiles))
 
-    class Tile:
-        tileCoords = ()
-        tileStanding = None
-        tileID = None
-
-        def __init__(self, tileid, cords):
-            self.tileCoords = cords
-            self.tileID = tileid
-
-        # gives the class a color, this is to determine if a piece is standing on the tile,
-        # it also gives us data about what teams piece is currently standing on this tile.
-        def movetotile(self, color):
-            self.tileStanding = color
+        fulllist = rightlist + leftlist
+        for i in range(len(fulllist)):
+            tile = Tile(i, fulllist[i])
+            self.fieldTiles.append(tile)

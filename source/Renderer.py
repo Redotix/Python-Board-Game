@@ -10,7 +10,7 @@ class Renderer:
     def render(self, color, inputtuple, dotsize):
         self.renderingTurtle.penup()
         self.renderingTurtle.hideturtle()
-        self.renderingTurtle.speed(0)
+        self.renderingTurtle.speed(6)
         self.renderingTurtle.color(color)
         self.renderingTurtle.setpos(offsettocenter(inputtuple))
         self.renderingTurtle.dot(dotsize)

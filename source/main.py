@@ -20,7 +20,7 @@ playingfield.generategield(settings.extratiles)
 canvassize = playingfield.canvassize
 win = t.Screen()
 win.setup(600, 600)
-win.setworldcoordinates(0, canvassize[0], canvassize[1], 0)
+win.setworldcoordinates(0, 0, canvassize[1], canvassize[0])
 win.bgcolor("grey")
 
 canvas = win.getcanvas()
@@ -28,8 +28,9 @@ canvas = win.getcanvas()
 # Debug rendering the playing field.
 t.tracer(False)
 for i in range(len(playingfield.fieldTiles)):
-    Renderer().render("white", playingfield.fieldTiles[i], playingfield.dotsize)
+    Renderer().render("white", playingfield.fieldTiles[i].tileCoords, playingfield.dotsize)
 t.tracer(True)
+
 
 
 # Variable with the playing field color and Coordinates in Touples
