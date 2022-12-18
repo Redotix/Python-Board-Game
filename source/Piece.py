@@ -5,14 +5,17 @@ from offsetfunc import *
 class Piece:
     position = None
     uniqueTurt = None
+    currentpos = None
+    isfinished = False
 
-    def __init__(self, piececolor):
+    def __init__(self, piececolor, piecesize):
         self.uniqueTurt = t.Turtle()
 
         self.uniqueTurt.shape("circle")
         self.uniqueTurt.color(piececolor)
         self.uniqueTurt.turtlesize(1.5, 1.5)
         self.uniqueTurt.penup()
+        self.uniqueTurt.turtlesize(piecesize / 25)
 
     def placepiece(self, position):
         self.uniqueTurt.speed(0)

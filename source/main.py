@@ -12,57 +12,95 @@ def inputsettings():
 
 
 settings = inputsettings()
-print(settings.playeramount, settings.pieceamount, settings.extratiles)
+playingfield = PlayField()
 
-playingfield = PlayField("white")
-playingfield.generategield(settings.extratiles)
+playingfield.generatefield(settings.extratiles)
 
-canvassize = playingfield.canvassize
 win = t.Screen()
 win.setup(600, 600)
-win.setworldcoordinates(0, 0, canvassize[1], canvassize[0])
+win.setworldcoordinates(0, 0, playingfield.canvassize[1], playingfield.canvassize[0])
 win.bgcolor("grey")
+t.colormode(255)
 
-canvas = win.getcanvas()
-
-# Debug rendering the playing field.
-t.tracer(False)
-for i in range(len(playingfield.fieldTiles)):
-    Renderer().render("white", playingfield.fieldTiles[i].tileCoords, playingfield.dotsize)
-t.tracer(True)
+players = []
 
 
+def initializescreen():
+    t.tracer(False)
 
-# Variable with the playing field color and Coordinates in Touples
-# playingField = PlayField("white",
-#                          [(7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (8, 5), (9, 5), (10, 5), (11, 5), (11, 6), (11, 7),
-#                           (10, 7), (9, 7), (8, 7), (7, 7), (7, 8), (7, 9), (7, 10), (7, 11), (6, 11), (5, 11), (5, 10),
-#                           (5, 9), (5, 8), (5, 7), (4, 7), (3, 7), (2, 7), (1, 7), (1, 6), (1, 5), (2, 5), (3, 5),
-#                           (4, 5), (5, 5), (5, 4), (5, 3), (5, 2), (5, 1), (6, 1), ])
+    for i in range(settings.playeramount):
+        player = Player(settings.piececolors[i],
+                        settings.housecolors[i],
+                        settings.starttilecolors[i],
+                        settings.pieceamount, playingfield.dotsize)
 
-# Variables that define the players and their team color, ending house coordinates, starting house coordinates
-# starting PlayField tile, ending PlayField tile and the color of the piece.
-# Player1 = Player("darkBlue", [(6, 2), (6, 3), (6, 4), (6, 5), ],
-#                  [(10, 1), (11, 1), (10, 2), (11, 2), ], 0, 39, "blue", 4)
-# Player2 = Player("gold", [(6, 10), (6, 9), (6, 8), (6, 7), ],
-#                  [(1, 10), (1, 11), (2, 10), (2, 11), ], 20, 19, "yellow", 4)
-# Player3 = Player("darkGreen", [(10, 6), (9, 6), (8, 6), (7, 6), ],
-#                  [(10, 10), (10, 11), (11, 10), (11, 11), ], 10, 9, "green", 4)
-# Player4 = Player("maroon", [(2, 6), (3, 6), (4, 6), (5, 6), ],
-#                  [(1, 1), (1, 2), (2, 1), (2, 2), ], 30, 29, "red", 4)
-#
-# players = [Player1, Player2, Player3, Player4]
-#
-# for player in range(len(players)):
-#     for piece in range(len(players[player].playerPieces)):
-#         players[player].playerPieces[piece].placepiece(players[player].startCoords[piece])
-#
-#     Renderer().render(players[player].playerColor, players[player].houseCoords + players[player].startCoords)
-# Renderer().render(playingField.color, playingField.playingFieldVar)
-#
-# for player in range(len(players)):
-#     for piece in range(len(players[player].playerPieces)):
-#         for tile in range(len(playingField.playingFieldVar)):
-#             players[player].playerPieces[piece].movepiece(playingField.playingFieldVar[tile])
+        players.append(player)
+
+    for i in range(len(playingfield.fieldTiles)):
+        Renderer().render(playingfield.color,
+                          playingfield.fieldTiles[i].tileCoords,
+                          playingfield.dotsize, "star")
+
+    for x in range(settings.playeramount):
+        Renderer().render(players[x].startTileColor,
+                          playingfield.fieldTiles[playingfield.starttileids[x]].tileCoords,
+                          playingfield.dotsize, "star")
+        for i in range(settings.pieceamount):
+            Renderer().render(players[x].houseColor,
+                              playingfield.endhouses[x][i].tileCoords,
+                              playingfield.dotsize, "questionmark")
+
+            Renderer().render(players[x].houseColor,
+                              playingfield.starthouses[x][i].tileCoords,
+                              playingfield.dotsize, "questionmark")
+
+    for i in range(settings.playeramount):
+        for x in range(settings.pieceamount):
+            players[i].playerPieces[x].placepiece(playingfield.starthouses[i][x].tileCoords)
+
+    t.tracer(True)
+
+
+initializescreen()
+
+lenghtoftravel = len(playingfield.fieldTiles) - 1
+
+
+def debugmove():
+    playerinput = 0
+    pieceinput = 0
+    print(players[playerinput].playerPieces[pieceinput].currentpos)
+    if players[playerinput].playerPieces[pieceinput].currentpos is None:
+        players[playerinput].playerPieces[pieceinput].movepiece(
+            playingfield.fieldTiles[playingfield.starttileids[playerinput]].tileCoords)
+        players[playerinput].playerPieces[pieceinput].currentpos = 1
+
+    elif players[playerinput].playerPieces[pieceinput].currentpos == lenghtoftravel:
+        players[playerinput].playerPieces[pieceinput].currentpos -= lenghtoftravel
+        players[playerinput].playerPieces[pieceinput].movepiece(
+            playingfield.endhouses[playerinput][players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
+        players[playerinput].playerPieces[pieceinput].currentpos += 1
+        players[playerinput].playerPieces[pieceinput].isfinished = True
+
+    elif players[playerinput].playerPieces[pieceinput].isfinished is not True:
+        if players[playerinput].playerPieces[pieceinput].currentpos + \
+                playingfield.starttileids[playerinput] + 1 \
+                < len(playingfield.fieldTiles):
+
+            players[playerinput].playerPieces[pieceinput].movepiece(
+                playingfield.fieldTiles[playingfield.starttileids[playerinput] +
+                                        players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
+            players[playerinput].playerPieces[pieceinput].currentpos += 1
+
+        else:
+            players[playerinput].playerPieces[pieceinput].currentpos -= len(playingfield.fieldTiles)
+            players[playerinput].playerPieces[pieceinput].movepiece(
+                playingfield.fieldTiles[playingfield.starttileids[playerinput] +
+                                        players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
+            players[playerinput].playerPieces[pieceinput].currentpos += 1
+
+
+for loop in range(43):
+    debugmove()
 
 win.mainloop()

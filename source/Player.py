@@ -2,23 +2,16 @@ from Piece import *
 
 
 class Player:
-    startCoords = []
-    houseCoords = []
-    playerColor = None
-    startID = None
-    endID = None
     playerPieces = []
     pieceColor = None
+    houseColor = None
+    startTileColor = None
 
-    def __init__(self, color, inputhouse, inputstart, startid, endid, piececolor, pieceamount):
-        self.playerColor = color
-        self.houseCoords = inputhouse
-        self.startCoords = inputstart
-        self.startID = startid
-        self.endID = endid
-        self.pieceColor = piececolor
+    def __init__(self, piececolor, housecolor, starttilecolor, playeramount, piecesize):
         self.playerPieces = []
-        for i in range(pieceamount):
-            piece = Piece(self.pieceColor)
+        self.pieceColor = piececolor
+        self.houseColor = housecolor
+        self.startTileColor = starttilecolor
+        for i in range(playeramount):
+            piece = Piece(self.pieceColor, piecesize)
             self.playerPieces.append(piece)
-
