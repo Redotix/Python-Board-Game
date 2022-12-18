@@ -70,11 +70,13 @@ def debugmove():
     playerinput = int(input())
     pieceinput = int(input())
     print(players[playerinput].playerPieces[pieceinput].currentpos)
+    # moving out of houses
     if players[playerinput].playerPieces[pieceinput].currentpos is None:
         players[playerinput].playerPieces[pieceinput].movepiece(
             playingfield.fieldTiles[playingfield.starttileids[playerinput]].tileCoords)
         players[playerinput].playerPieces[pieceinput].currentpos = 1
 
+    # moving to houses
     elif players[playerinput].playerPieces[pieceinput].currentpos == lenghtoftravel:
         players[playerinput].playerPieces[pieceinput].currentpos -= lenghtoftravel
         players[playerinput].playerPieces[pieceinput].movepiece(
@@ -82,6 +84,7 @@ def debugmove():
         players[playerinput].playerPieces[pieceinput].currentpos += 1
         players[playerinput].playerPieces[pieceinput].isfinished = True
 
+    # regular movement with looping function
     elif players[playerinput].playerPieces[pieceinput].isfinished is not True:
         if players[playerinput].playerPieces[pieceinput].currentpos + \
                 playingfield.starttileids[playerinput] + 1 \

@@ -27,6 +27,7 @@ class PlayField:
         rightlist = []
         leftlist = []
 
+        # generate playing field in the right order and write down the tiles into a list
         for x in range(2 + extratiles):
             rightlist.append((center + 1, center + 2 + extratiles - x))
             leftlist.append((center - 1, center - 2 - extratiles + x))
@@ -54,6 +55,7 @@ class PlayField:
             tile = Tile(i, fulllist[i], False)
             self.fieldTiles.append(tile)
 
+        # create tiles for end houses and put them in a list
         for i in range(extratiles + 1):
             endhousetuples1 = (center, center + extratiles + 1 - i)
             endhousetuples2 = (center, center - extratiles - 1 + i)
@@ -70,6 +72,7 @@ class PlayField:
             self.endhouses[2].append(tile3)
             self.endhouses[3].append(tile4)
 
+        # create tiles for starting houes in a grid and put them in a list
         for y in range(1 + int((extratiles / 2))):
             for x in range(1 + int((extratiles / 2))):
                 starthouses1 = (canvassize - 2 - y, canvassize - 2 - x)
@@ -87,6 +90,7 @@ class PlayField:
                 self.starthouses[2].append(tile3)
                 self.starthouses[3].append(tile4)
 
+        # put the IDs of starting tiles into a list
         startingtilesdivision = int(len(self.fieldTiles) / 4)
         for i in range(len(self.fieldTiles)):
             self.starttileids.append(self.fieldTiles[i].tileID)
