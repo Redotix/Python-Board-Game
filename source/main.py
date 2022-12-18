@@ -67,8 +67,8 @@ lenghtoftravel = len(playingfield.fieldTiles) - 1
 
 
 def debugmove():
-    playerinput = 0
-    pieceinput = 0
+    playerinput = int(input())
+    pieceinput = int(input())
     print(players[playerinput].playerPieces[pieceinput].currentpos)
     if players[playerinput].playerPieces[pieceinput].currentpos is None:
         players[playerinput].playerPieces[pieceinput].movepiece(
@@ -99,8 +99,9 @@ def debugmove():
                                         players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
             players[playerinput].playerPieces[pieceinput].currentpos += 1
 
-
-for loop in range(43):
     debugmove()
+
+
+debugmove()
 
 win.mainloop()
