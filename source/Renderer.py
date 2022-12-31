@@ -4,6 +4,7 @@ from offsetfunc import *
 
 class Renderer:
     renderingTurtle = t.Turtle()
+    writingTurtle = t.Turtle()
 
     # Draws a dot on the given coordinate with the given color offset by 0.5 on both axis
     # this resutls in the dot being drawn at the center of the coordinate.
@@ -50,3 +51,10 @@ class Renderer:
             self.renderingTurtle.forward(0.1)
             self.renderingTurtle.setheading(0)
             self.renderingTurtle.penup()
+
+    def drawtext(self, text, position, size):
+        self.writingTurtle.up()
+        self.writingTurtle.speed(0)
+        self.writingTurtle.setpos(position)
+        self.writingTurtle.write(text, False, "left", ('Arial', size, 'normal'))
+

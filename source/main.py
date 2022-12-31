@@ -2,6 +2,7 @@ from Settings import *
 from Renderer import *
 from PlayField import *
 from Player import *
+import random
 
 
 def inputsettings():
@@ -32,7 +33,7 @@ def initializescreen():
         player = Player(settings.piececolors[i],
                         settings.housecolors[i],
                         settings.starttilecolors[i],
-                        settings.pieceamount, playingfield.dotsize)
+                        settings.pieceamount, playingfield.dotsize, playingfield.starttileids[i])
 
         players.append(player)
 
@@ -63,48 +64,90 @@ def initializescreen():
 
 initializescreen()
 
-lenghtoftravel = len(playingfield.fieldTiles) - 1
+lenghtoftravel = len(playingfield.fieldTiles)
+playerchoice = 1
+piecechoice = 2
+
+
+def iteratetroughfield(looprange):
+    for i in range(looprange):
+        players[playerchoice].playerPieces[piecechoice].movepiece(
+            playingfield.fieldTiles[players[playerchoice].playerPieces[piecechoice].positioninplayingfield].tileCoords)
+        players[playerchoice].playerPieces[piecechoice].tilesmoved += 1
+        players[playerchoice].playerPieces[piecechoice].positioninplayingfield += 1
+
+
+def iteratetroughhouse(looprange):
+    for i in range(looprange):
+        players[playerchoice].playerPieces[piecechoice].movepiece(
+            playingfield.endhouses[playerchoice]
+            [players[playerchoice].playerPieces[piecechoice].positioninhouse].tileCoords)
+        players[playerchoice].playerPieces[piecechoice].tilesmoved += 1
+        players[playerchoice].playerPieces[piecechoice].positioninhouse += 1
 
 
 def debugmove():
-    playerinput = int(input())
-    pieceinput = int(input())
-    print(players[playerinput].playerPieces[pieceinput].currentpos)
-    # moving out of houses
-    if players[playerinput].playerPieces[pieceinput].currentpos is None:
-        players[playerinput].playerPieces[pieceinput].movepiece(
-            playingfield.fieldTiles[playingfield.starttileids[playerinput]].tileCoords)
-        players[playerinput].playerPieces[pieceinput].currentpos = 1
+    roll = random.randrange(1, 7)
+    difference = (players[playerchoice].playerPieces[piecechoice].positioninplayingfield + roll) - lenghtoftravel
+    difference = max(0, difference)
+    if players[playerchoice].playerPieces[piecechoice].tilesmoved + roll > lenghtoftravel and \
+            players[playerchoice].playerPieces[piecechoice].isinhouse is False:
+        housedifference = lenghtoftravel - players[playerchoice].playerPieces[piecechoice].tilesmoved
+        iteratetroughfield(housedifference)
+        iteratetroughhouse(roll - housedifference)
+        players[playerchoice].playerPieces[piecechoice].isinhouse = True
+    elif players[playerchoice].playerPieces[piecechoice].isinhouse is False:
+        iteratetroughfield(roll - difference)
 
-    # moving to houses
-    elif players[playerinput].playerPieces[pieceinput].currentpos == lenghtoftravel:
-        players[playerinput].playerPieces[pieceinput].currentpos -= lenghtoftravel
-        players[playerinput].playerPieces[pieceinput].movepiece(
-            playingfield.endhouses[playerinput][players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
-        players[playerinput].playerPieces[pieceinput].currentpos += 1
-        players[playerinput].playerPieces[pieceinput].isfinished = True
+        if difference > 0:
+            players[playerchoice].playerPieces[piecechoice].positioninplayingfield = 0
+            iteratetroughfield(difference)
 
-    # regular movement with looping function
-    elif players[playerinput].playerPieces[pieceinput].isfinished is not True:
-        if players[playerinput].playerPieces[pieceinput].currentpos + \
-                playingfield.starttileids[playerinput] + 1 \
-                < len(playingfield.fieldTiles):
-
-            players[playerinput].playerPieces[pieceinput].movepiece(
-                playingfield.fieldTiles[playingfield.starttileids[playerinput] +
-                                        players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
-            players[playerinput].playerPieces[pieceinput].currentpos += 1
-
-        else:
-            players[playerinput].playerPieces[pieceinput].currentpos -= len(playingfield.fieldTiles)
-            players[playerinput].playerPieces[pieceinput].movepiece(
-                playingfield.fieldTiles[playingfield.starttileids[playerinput] +
-                                        players[playerinput].playerPieces[pieceinput].currentpos].tileCoords)
-            players[playerinput].playerPieces[pieceinput].currentpos += 1
-
-    debugmove()
+    for i in range(10):
+        print()
+    print("Rolled: ", roll)
+    print("Difference was: ", difference)
+    print("Total tiles moved: ", players[playerchoice].playerPieces[piecechoice].tilesmoved)
+    print("Real position on playing field: ", players[playerchoice].playerPieces[piecechoice].positioninplayingfield)
 
 
-debugmove()
+# def turn():
+#     global playerchoice
+#     global piecechoice
+#     playerchoice += 1
+#     piecechoice = 0
+#     if playerchoice == len(players):
+#         playerchoice = 0
+#
+#
+# def nextpiece():
+#     global piecechoice
+#     piecechoice += 1
+#     if piecechoice == len(players[0].playerPieces):
+#         piecechoice = 0
+#
+#
+# def previouspiece():
+#     global piecechoice
+#     piecechoice -= 1
+#     if piecechoice == -1:
+#         piecechoice = len(players[0].playerPieces) - 1
+
+
+# def renderinfo():
+#     t.tracer(False)
+#     player = "Player " + str(playerchoice + 1) + "'s turn."
+#     piece = "Piece " + str(piecechoice + 1)
+#     Renderer().writingTurtle.clear()
+#     Renderer().drawtext(player, (0, 0), 12)
+#     Renderer().drawtext(piece, (0, 1), 12)
+#     t.tracer(True)
+
+
+# turn()
+# win.onkey(nextpiece, "Right")
+# win.onkey(previouspiece, "Left")
+win.onkey(debugmove, "Return")
+win.listen()
 
 win.mainloop()
