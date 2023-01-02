@@ -62,10 +62,10 @@ class PlayField:
             endhousetuples3 = (center + extratiles + 1 - i, center)
             endhousetuples4 = (center - extratiles - 1 + i, center)
 
-            tile1 = Tile(1, endhousetuples1, True)
-            tile2 = Tile(1, endhousetuples2, True)
-            tile3 = Tile(1, endhousetuples3, True)
-            tile4 = Tile(1, endhousetuples4, True)
+            tile1 = Tile(i, endhousetuples1, True)
+            tile2 = Tile(i, endhousetuples2, True)
+            tile3 = Tile(i, endhousetuples3, True)
+            tile4 = Tile(i, endhousetuples4, True)
 
             self.endhouses[0].append(tile1)
             self.endhouses[1].append(tile2)
@@ -73,8 +73,8 @@ class PlayField:
             self.endhouses[3].append(tile4)
 
         # create tiles for starting houes in a grid and put them in a list
-        for y in range(1 + int((extratiles / 2))):
-            for x in range(1 + int((extratiles / 2))):
+        for y in range(1 + int(((extratiles / 2) + 0.5))):
+            for x in range(1 + int(((extratiles / 2) + 0.5))):
                 starthouses1 = (canvassize - 2 - y, canvassize - 2 - x)
                 starthouses2 = (1 + y, 1 + x)
                 starthouses3 = (canvassize - 2 - y, 1 + x)
