@@ -5,6 +5,12 @@ from Player import *
 import random
 
 
+win = t.Screen()
+win.setup(600, 600)
+win.bgcolor("grey")
+t.colormode(255)
+
+
 def inputsettings():
     playeramount = 4
     pieceamount = 4
@@ -17,11 +23,7 @@ playingfield = PlayField()
 
 playingfield.generatefield(settings.extratiles)
 
-win = t.Screen()
-win.setup(600, 600)
 win.setworldcoordinates(0, 0, playingfield.canvassize[1], playingfield.canvassize[0])
-win.bgcolor("grey")
-t.colormode(255)
 
 players = []
 
@@ -151,7 +153,7 @@ def performmovement(roll):
         print()
     print("Rolled: ", roll)
 
-    # If the move would result in a piece going outside of the playing field or end house, the move gets skipped
+    # If the move results in a piece going outside the playing field or end house, the move gets skipped
     if piece.tilesmoved + roll + piece.positioninhouse > lenghtoftravel - 1 + settings.pieceamount:
         return
 
@@ -172,7 +174,6 @@ def performmovement(roll):
             iteratetroughhouse(roll - housedifference)
             piece.tilesmoved = currenttilesmoved
             if piece.isinhouse is False:
-                print("youregay")
                 piece.positioninplayingfield = currentposition.tileID
                 piece.positioninhouse = -1
                 piece.movepiece(currentposition.tileCoords)
