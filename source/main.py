@@ -35,7 +35,7 @@ def initializescreen():
         player = Player(settings.piececolors[i],
                         settings.housecolors[i],
                         settings.starttilecolors[i],
-                        settings.pieceamount, playingfield.dotsize, playingfield.starttileids[i])
+                        settings.pieceamount, playingfield.dotsize)
 
         players.append(player)
 
@@ -69,8 +69,8 @@ initializescreen()
 lenghtoftravel = len(playingfield.fieldTiles)
 playerchoice = 0
 piecechoice = 0
-
-piece = players[playerchoice].playerPieces[piecechoice]
+rollnum = 0
+attempt = 0
 
 
 # Debug method for randomly placing pieces on the field
@@ -87,13 +87,6 @@ def shufflepieces():
                     playingfield.fieldTiles[placement].tilestandingpiece = x
 
 
-# players[0].playerPieces[1].placepiece(playingfield.endhouses[0][0].tileCoords)
-# playingfield.endhouses[0][0].tilestandingpiece = 1
-# players[0].playerPieces[2].placepiece(playingfield.endhouses[0][1].tileCoords)
-# playingfield.endhouses[0][1].tilestandingpiece = 2
-# players[0].playerPieces[3].placepiece(playingfield.endhouses[0][3].tileCoords)
-# playingfield.endhouses[0][3].tilestandingpiece = 3
-
 # Method for kicking pieces from the playing field back into starter houses
 def kickpiece(teamtokick, piecetokick):
     players[teamtokick].playerPieces[piecetokick].movepiece(
@@ -104,6 +97,8 @@ def kickpiece(teamtokick, piecetokick):
 
 # Method for placing piece on the field from the start house
 def initiatepiece():
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     startingtile = playingfield.fieldTiles[playingfield.starttileids[playerchoice]]
     piece.positioninplayingfield = playingfield.starttileids[playerchoice]
     piece.tilesmoved = 1
@@ -116,6 +111,8 @@ def initiatepiece():
 
 # Method for moving pieces on the playing field
 def iteratetroughfield(looprange):
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     for i in range(looprange):
         piece.tilesmoved += 1
         piece.positioninplayingfield += 1
@@ -124,38 +121,46 @@ def iteratetroughfield(looprange):
 
 # Method for moving pieces inside end houses
 def iteratetroughhouse(looprange):
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     for i in range(looprange):
         piece.positioninhouse += 1
         piece.movepiece(playingfield.endhouses[playerchoice][piece.positioninhouse].tileCoords)
 
 
 def notifytileofpeice():
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     playingfield.fieldTiles[piece.positioninplayingfield].tilestandingplayer = playerchoice
     playingfield.fieldTiles[piece.positioninplayingfield].tilestandingpiece = piecechoice
 
 
 def removepiecefromtile():
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     playingfield.fieldTiles[piece.positioninplayingfield].tilestandingplayer = None
     playingfield.fieldTiles[piece.positioninplayingfield].tilestandingpiece = None
 
 
 def notifyhouseofpiece():
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     playingfield.endhouses[playerchoice][piece.positioninhouse].tilestandingpiece = piecechoice
 
 
 def removepiecefromhouse():
+    piece = players[playerchoice].playerPieces[piecechoice]
+
     playingfield.endhouses[playerchoice][piece.positioninhouse].tilestandingpiece = None
 
 
 # Method with logic and rules for moving pieces.
 def performmovement(roll):
-    for i in range(10):
-        print()
-    print("Rolled: ", roll)
+    piece = players[playerchoice].playerPieces[piecechoice]
 
     # If the move results in a piece going outside the playing field or end house, the move gets skipped
     if piece.tilesmoved + roll + piece.positioninhouse > lenghtoftravel - 1 + settings.pieceamount:
-        return
+        return False
 
     # If the move results in the piece exceeding the lenght of travel needed to get into a house
     if piece.tilesmoved + roll > lenghtoftravel:
@@ -180,7 +185,7 @@ def performmovement(roll):
             else:
                 piece.positioninhouse = currentposition.tileID
                 piece.movepiece(currentposition.tileCoords)
-            return
+            return True
 
         removepiecefromhouse()
         iteratetroughfield(housedifference)
@@ -189,7 +194,7 @@ def performmovement(roll):
         if piece.isinhouse is False:
             playingfield.fieldTiles[piece.positioninplayingfield].tilestandingplayer = None
         piece.isinhouse = True
-        return
+        return False
 
     removepiecefromtile()
     difference = (piece.positioninplayingfield + roll) - (lenghtoftravel - 1)
@@ -213,7 +218,7 @@ def performmovement(roll):
         piece.positioninplayingfield = currentposition.tileID
         piece.movepiece(currentposition.tileCoords)
         notifytileofpeice()
-        return
+        return False
 
     # if the tile inside the playing field is occupied by a piece of another player, the peice gets kicked out
     elif futureposition.tilestandingplayer != playerchoice and futureposition.tilestandingplayer is not None:
@@ -223,7 +228,7 @@ def performmovement(roll):
             iteratetroughfield(difference)
         kickpiece(futureposition.tilestandingplayer, futureposition.tilestandingpiece)
         notifytileofpeice()
-        return
+        return True
 
     iteratetroughfield(roll - difference)
     if difference > 0:
@@ -231,28 +236,121 @@ def performmovement(roll):
         iteratetroughfield(difference)
 
     notifytileofpeice()
-
-    print("Difference was: ", difference)
-    print("Total tiles moved: ", piece.tilesmoved)
-    print("Real position on playing field: ", piece.positioninplayingfield)
+    return True
 
 
-def debugkey():
-    roll = random.randrange(1, 7)
-    performmovement(roll)
-    print(players[2].playerPieces[0].isinhouse)
+def printstate():
+    global playerchoice
+    global piecechoice
+
+    print("Its player ", playerchoice, "'s turn.")
+    print("Piece number ", piecechoice, " is chosen")
 
 
-# shufflepieces()
-initiatepiece()
+def cyclepiecesright(pieceamount):
+    global piecechoice
 
-for q in range(len(playingfield.fieldTiles)):
-    if playingfield.fieldTiles[q].tilestandingplayer is not None:
-        print("field tile", q, playingfield.fieldTiles[q].tileCoords, playingfield.fieldTiles[q].tilestandingpiece)
-# turn()
-# win.onkey(nextpiece, "Right")
-# win.onkey(previouspiece, "Left")
-win.onkey(debugkey, "Return")
+    if piecechoice + 1 > pieceamount - 1:
+        piecechoice = 0
+    else:
+        piecechoice += 1
+
+    printstate()
+
+
+def cyclepiecesleft(pieceamount):
+    global piecechoice
+
+    if piecechoice - 1 < 0:
+        piecechoice = pieceamount - 1
+    else:
+        piecechoice -= 1
+
+    printstate()
+
+
+def cycleplayers(playeramount):
+    global playerchoice
+
+    if playerchoice + 1 > playeramount - 1:
+        playerchoice = 0
+    else:
+        playerchoice += 1
+
+    printstate()
+
+
+def skipturn(playeramount):
+    cycleplayers(playeramount)
+    print("You skipped your turn")
+
+
+def moveattempt(playeramount):
+    global rollnum
+    global attempt
+    piecesonboard = None
+
+    piece = players[playerchoice].playerPieces[piecechoice]
+
+    if rollnum == 0:
+        rollnum = random.randrange(1, 7)
+
+    for i in range(10):
+        print()
+    print("Rolled: ", rollnum)
+
+    for i in range(len(players[playerchoice].playerPieces)):
+        if players[playerchoice].playerPieces[i].positioninplayingfield is not None:
+            piecesonboard = True
+        elif piecesonboard is not True:
+            piecesonboard = False
+
+    print("piece on board is ", piecesonboard)
+
+    if piecesonboard is False and rollnum == 6:
+        initiatepiece()
+        cycleplayers(playeramount)
+        rollnum = 0
+        attempt = 0
+        print("Placed piece of playing field")
+        return
+
+    elif piecesonboard is False and rollnum != 6:
+        if attempt + 1 > 2:
+            rollnum = 0
+            attempt = 0
+            cycleplayers(playeramount)
+            print("Out of attempts, turn skipped")
+        else:
+            rollnum = 0
+            attempt += 1
+            print("Didnt throw 6, you have another attempt")
+        return
+
+    if piece.positioninplayingfield is None and rollnum == 6:
+        initiatepiece()
+        cycleplayers(playeramount)
+        rollnum = 0
+        print("Placed piece of playing field")
+        return
+
+    elif piece.positioninplayingfield is None and rollnum != 6:
+        print("Didnt roll a 6, choose a different piece or skip turn")
+        return
+
+    answer = performmovement(rollnum)
+    if answer is True:
+        cycleplayers(playeramount)
+        rollnum = 0
+        print("Moved piece")
+        return
+    print("Piece cant move there, choose a different piece or skip turn")
+
+
+win.onkey(lambda: cyclepiecesleft(settings.pieceamount), "Left")
+win.onkey(lambda: cyclepiecesright(settings.pieceamount), "Right")
+win.onkey(lambda: moveattempt(settings.playeramount), "Return")
+win.onkey(lambda: skipturn(settings.playeramount), "s")
 win.listen()
 
 win.mainloop()

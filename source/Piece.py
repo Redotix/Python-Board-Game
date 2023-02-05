@@ -10,7 +10,7 @@ class Piece:
     tilesmoved = 0
     isinhouse = False
 
-    def __init__(self, piececolor, piecesize, positioninplayingfield):
+    def __init__(self, piececolor, piecesize):
         self.uniqueTurt = t.Turtle()
 
         self.uniqueTurt.shape("circle")
@@ -18,8 +18,6 @@ class Piece:
         self.uniqueTurt.turtlesize(1.5, 1.5)
         self.uniqueTurt.penup()
         self.uniqueTurt.turtlesize(piecesize / 25)
-
-        self.positioninplayingfield = positioninplayingfield
 
     def placepiece(self, position):
         self.uniqueTurt.speed(0)
