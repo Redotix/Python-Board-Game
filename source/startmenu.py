@@ -1,10 +1,5 @@
-import turtle as t
 from tkinter import *
-
-win = t.Screen()
-win.setup(600, 600)
-win.bgcolor("grey")
-t.colormode(255)
+from inputs import *
 
 canvas = win.getcanvas()
 
@@ -86,7 +81,7 @@ class GameOptions:
         # Piece amount widgets
         self.pieceamountlabel = Label(canvas.master, text="Amount of pieces:", font=menufont)
         self.pieceamounthigher = Button(canvas.master, text=">",
-                                         command=lambda: self.increasepieceamount(), font=menufont)
+                                        command=lambda: self.increasepieceamount(), font=menufont)
 
         self.pieceamountnumber = Label(canvas.master, text=str(self.pieceamount), font=menufont)
         self.pieceamountlower = Button(canvas.master, text="<",
@@ -95,11 +90,11 @@ class GameOptions:
         # Tile amount widgets
         self.tileamountlabel = Label(canvas.master, text="Amount of extra tiles:", font=menufont)
         self.tileamounthigher = Button(canvas.master, text=">",
-                                         command=lambda: self.increasetileamount(), font=menufont)
+                                       command=lambda: self.increasetileamount(), font=menufont)
 
         self.tileamountnumber = Label(canvas.master, text=str(self.tileamount), font=menufont)
         self.tileamountlower = Button(canvas.master, text="<",
-                                        command=lambda: self.decreasetileamount(), font=menufont)
+                                      command=lambda: self.decreasetileamount(), font=menufont)
 
         self.back = Button(canvas.master, text="Back", command=lambda: self.backbtn(), font=menufont)
         self.startgame = Button(canvas.master, text="Start", command=lambda: self.startbtn(), font=menufont)
@@ -185,6 +180,8 @@ class GameOptions:
 
     def startbtn(self):
         self.hidegameoptions()
+        GameMaster(self.playeramount, self.pieceamount, self.tileamount)
+        GameMaster.inmenu = False
 
 
 class GameGuide:
@@ -206,4 +203,4 @@ class GameGuide:
 
 Mainmenu().showmainmenu()
 
-mainloop()
+win.mainloop()

@@ -6,6 +6,8 @@ class Settings:
     housecolors = [(43, 55, 166), (153, 153, 35), (22, 130, 26), (148, 24, 24)]
     starttilecolors = [(103, 114, 219), (214, 214, 103), (106, 189, 109), (186, 95, 95)]
 
+    playernames = ["Blue", "Yellow", "Green", "Red"]
+
     def __init__(self, playeramount, pieceamount, extratiles):
         self.playeramount = playeramount
         self.pieceamount = pieceamount

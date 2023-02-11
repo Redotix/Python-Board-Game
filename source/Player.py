@@ -7,11 +7,11 @@ class Player:
     houseColor = None
     startTileColor = None
 
-    def __init__(self, piececolor, housecolor, starttilecolor, playeramount, piecesize):
+    def __init__(self, piececolor, housecolor, starttilecolor, pieceamount, piecesize):
         self.playerPieces = []
         self.pieceColor = piececolor
         self.houseColor = housecolor
         self.startTileColor = starttilecolor
-        for i in range(playeramount):
-            piece = Piece(self.pieceColor, piecesize)
+        for thispiece in range(pieceamount):
+            piece = Piece(self.pieceColor, piecesize, thispiece)
             self.playerPieces.append(piece)

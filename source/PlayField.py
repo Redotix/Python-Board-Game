@@ -15,6 +15,7 @@ class PlayField:
     starthouses = [[], [], [], []]
     endhouses = [[], [], [], []]
     starttileids = []
+    decoration = []
 
     def __init__(self):
         self.fieldTiles = []
@@ -26,6 +27,10 @@ class PlayField:
         center = (canvassize / 2) - 0.5
         rightlist = []
         leftlist = []
+
+        for x in range(canvassize):
+            for y in range(canvassize):
+                self.decoration.append((x, y))
 
         # generate playing field in the right order and write down the tiles into a list
         for x in range(2 + extratiles):
