@@ -5,9 +5,17 @@ from Player import *
 import random
 
 win = t.Screen()
-win.setup(600, 600)
+canvas = win.getcanvas()
+root = canvas.winfo_toplevel()
+root.resizable(False, False)
+windowsize = canvas.winfo_screenheight() - 210
+# windowsize = 800 - 210
+win.setup(windowsize, windowsize + 90)
 t.colormode(255)
-win.bgcolor((128, 128, 128))
+bgcolor = (128, 128, 128)
+win.bgcolor(bgcolor)
+
+fontsizefactor = 40
 
 
 class GameMaster:
@@ -18,15 +26,14 @@ class GameMaster:
     lenghtoftravel = len(playingfield.fieldTiles)
     playerchoice = 0
     piecechoice = 0
+    roll = 0
     inmenu = True
-
-    data = None
 
     def __init__(self, playeramount, pieceamount, extratiles):
         t.tracer(False)
         self.settings = Settings(playeramount, pieceamount, extratiles)
 
-        self.playingfield.generatefield(self.settings.extratiles)
+        self.playingfield.generatefield(self.settings.extratiles, windowsize)
         win.setworldcoordinates(0, 0, self.playingfield.canvassize[1], self.playingfield.canvassize[0])
 
         for i in range(len(self.playingfield.decoration)):
@@ -63,9 +70,13 @@ class GameMaster:
                 self.players[i].playerPieces[x].placepiece(self.playingfield.starthouses[i][x].tileCoords)
 
         Renderer().inithighlight(self.playingfield.dotsize)
-        Renderer().refreshui(self.playingfield.canvassize[0],
+
+        Renderer().refreshui(self.playingfield.canvassize[1],
                              self.settings.playernames[self.playerchoice],
-                             self.piecechoice, 0)
+                             self.piecechoice, self.roll, int(windowsize / fontsizefactor),
+                             Settings.playernames)
+        position = self.players[self.playerchoice].playerPieces[self.piecechoice].position
+        Renderer().highlight((position[0] + 0.5, position[1] + 0.5))
 
         t.tracer(True)
 
@@ -151,7 +162,7 @@ class GameMaster:
 
         # If the move results in a piece going outside the playing field or end house, the move gets skipped
         if piece.tilesmoved + roll + piece.positioninhouse > self.lenghtoftravel - 1 + self.settings.pieceamount:
-            return False
+            return "Roll too big, pick a different piece or skip your turn."
 
         # If the move results in the piece exceeding the lenght of travel needed to get into a house
         if piece.tilesmoved + roll > self.lenghtoftravel:

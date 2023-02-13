@@ -7,9 +7,14 @@ class Renderer:
     writingTurtle = t.Turtle()
     clickselectTurtle = t.Turtle()
 
+    renderingTurtle.hideturtle()
+    writingTurtle.hideturtle()
+    clickselectTurtle.hideturtle()
+
     # Draws a dot on the given coordinate with the given color offset by 0.5 on both axis
     # this resutls in the dot being drawn at the center of the coordinate.
     def render(self, color, inputtuple, dotsize, symbol):
+
         self.renderingTurtle.penup()
         self.renderingTurtle.hideturtle()
         self.renderingTurtle.speed(6)
@@ -64,12 +69,12 @@ class Renderer:
             self.renderingTurtle.setheading(0)
             self.renderingTurtle.penup()
 
-    def inithighlight(self, piecesize):
+    def inithighlight(self, dotsize):
         self.clickselectTurtle.shape("circle")
         self.clickselectTurtle.color("orange")
-        self.clickselectTurtle.penup()
-        self.clickselectTurtle.turtlesize(piecesize / 18)
         self.clickselectTurtle.hideturtle()
+        self.clickselectTurtle.penup()
+        self.clickselectTurtle.turtlesize(dotsize / 17)
 
     def highlight(self, position):
         t.tracer(False)
@@ -80,16 +85,29 @@ class Renderer:
     def hidehighlight(self):
         self.clickselectTurtle.hideturtle()
 
-    def refreshui(self, canvassize, playername, piecechosen, roll):
+    def refreshui(self, canvassize, playername, piecechosen, roll, fontsize, namelist):
         t.tracer(False)
-        fontsize = 15
+        font = ('Arial', fontsize, 'normal')
+        namefont = ('Arial', fontsize, 'bold')
 
         self.writingTurtle.clear()
+        self.writingTurtle.hideturtle()
         self.writingTurtle.up()
-        self.writingTurtle.goto(0, 0)
+
+        self.writingTurtle.goto(canvassize - 1 - 0.37, canvassize - 1 + 0.25)
+        self.writingTurtle.color("black")
+        self.writingTurtle.write(namelist[0], False, "right", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.goto(1 + 0.37, 0 + 0.25)
+        self.writingTurtle.write(namelist[1], False, "left", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.goto(canvassize - 1 - 0.37, 0 + 0.25)
+        self.writingTurtle.write(namelist[2], False, "right", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.goto(1 + 0.37, canvassize - 1 + 0.25)
+        self.writingTurtle.write(namelist[3], False, "left", ('Arial', fontsize, 'bold'))
+
+        self.writingTurtle.goto(0, canvassize)
         self.writingTurtle.write(f"  {playername}'s Turn", False, "left", ('Arial', fontsize, 'normal'))
-        self.writingTurtle.goto(canvassize / 2, 0)
-        self.writingTurtle.write(f"Piece {piecechosen} chosen", False, "center", ('Arial', fontsize, 'normal'))
-        self.writingTurtle.goto(canvassize, 0)
+        self.writingTurtle.goto(canvassize / 2, canvassize)
+        self.writingTurtle.write(f"Piece {piecechosen + 1} chosen", False, "center", ('Arial', fontsize, 'normal'))
+        self.writingTurtle.goto(canvassize, canvassize)
         self.writingTurtle.write(f"You Rolled: {roll}  ", False, "right", ('Arial', fontsize, 'normal'))
         t.tracer(True)

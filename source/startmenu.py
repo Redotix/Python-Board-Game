@@ -1,9 +1,11 @@
-from tkinter import *
 from inputs import *
 
-canvas = win.getcanvas()
+menufont = ('Arial', int(windowsize / fontsizefactor), 'normal')
+titlefont = ('Comic Sans MS', int(windowsize / (fontsizefactor * 0.5)), 'normal')
 
-menufont = ('Arial', 15, 'normal')
+
+def rgbtohex(rgb):
+    return "#%02x%02x%02x" % rgb
 
 
 def exitgame():
@@ -17,10 +19,13 @@ class Mainmenu:
     gamename = None
 
     def __init__(self):
-        self.start = Button(canvas.master, text="Start Game", command=lambda: self.startbtn(), font=menufont)
-        self.leave = Button(canvas.master, text="Exit Game", command=lambda: exitgame(), font=menufont)
-        self.gameguide = Button(canvas.master, text="Game Guide", command=lambda: self.gameguidebtn(), font=menufont)
-        self.gamename = Label(text="Game Name", font=menufont)
+        self.start = Button(canvas.master, text="Start Game", width=int(windowsize / 50),
+                            command=lambda: self.startbtn(), font=menufont)
+        self.leave = Button(canvas.master, text="Exit Game", width=int(windowsize / 50),
+                            command=lambda: exitgame(), font=menufont)
+        self.gameguide = Button(canvas.master, text="Game Guide", width=int(windowsize / 50),
+                                command=lambda: self.gameguidebtn(), font=menufont)
+        self.gamename = Label(text="Clovece Nehnevaj Sa!", font=titlefont, bg=rgbtohex(bgcolor))
 
     def showmainmenu(self):
         self.start.place(relx=0.5, rely=0.42, anchor=CENTER)
@@ -44,9 +49,9 @@ class Mainmenu:
 
 
 class GameOptions:
-    playeramount = 2
-    pieceamount = 1
-    tileamount = 0
+    playeramount = 4
+    pieceamount = 4
+    tileamount = 3
 
     toptext = None
     playeramountlabel = None
@@ -64,39 +69,48 @@ class GameOptions:
     tileamountnumber = None
     tileamountlower = None
     back = None
+
+    namesbtn = None
+    initialnames = ["Blue", "Yellow", "Green", "Red"]
+    names = []
+    entryfields = []
+
     startgame = None
 
+    inputsystem = None
+
     def __init__(self):
-        self.toptext = Label(canvas.master, text="Choose Game settings", font=menufont)
+        self.toptext = Label(canvas.master, text="Choose Game settings", font=menufont, bg=rgbtohex(bgcolor))
 
         # Player amount widgets
-        self.playeramountlabel = Label(canvas.master, text="Amount of players:", font=menufont)
+        self.playeramountlabel = Label(canvas.master, text="Amount of players:", font=menufont, bg=rgbtohex(bgcolor))
         self.playeramounthigher = Button(canvas.master, text=">",
                                          command=lambda: self.increaseplayeramount(), font=menufont)
 
-        self.playeramountnumber = Label(canvas.master, text=str(self.playeramount), font=menufont)
+        self.playeramountnumber = Label(canvas.master, text=str(self.playeramount), font=menufont, bg=rgbtohex(bgcolor))
         self.playeramountlower = Button(canvas.master, text="<",
                                         command=lambda: self.decreaseplayeramount(), font=menufont)
 
         # Piece amount widgets
-        self.pieceamountlabel = Label(canvas.master, text="Amount of pieces:", font=menufont)
+        self.pieceamountlabel = Label(canvas.master, text="Amount of pieces:", font=menufont, bg=rgbtohex(bgcolor))
         self.pieceamounthigher = Button(canvas.master, text=">",
                                         command=lambda: self.increasepieceamount(), font=menufont)
 
-        self.pieceamountnumber = Label(canvas.master, text=str(self.pieceamount), font=menufont)
+        self.pieceamountnumber = Label(canvas.master, text=str(self.pieceamount), font=menufont, bg=rgbtohex(bgcolor))
         self.pieceamountlower = Button(canvas.master, text="<",
                                        command=lambda: self.decreasepieceamount(), font=menufont)
 
         # Tile amount widgets
-        self.tileamountlabel = Label(canvas.master, text="Amount of extra tiles:", font=menufont)
+        self.tileamountlabel = Label(canvas.master, text="Amount of extra tiles:", font=menufont, bg=rgbtohex(bgcolor))
         self.tileamounthigher = Button(canvas.master, text=">",
                                        command=lambda: self.increasetileamount(), font=menufont)
 
-        self.tileamountnumber = Label(canvas.master, text=str(self.tileamount), font=menufont)
+        self.tileamountnumber = Label(canvas.master, text=str(self.tileamount), font=menufont, bg=rgbtohex(bgcolor))
         self.tileamountlower = Button(canvas.master, text="<",
                                       command=lambda: self.decreasetileamount(), font=menufont)
 
         self.back = Button(canvas.master, text="Back", command=lambda: self.backbtn(), font=menufont)
+        self.namesbtn = Button(canvas.master, text="Choose Names", command=lambda: self.namewindow(), font=menufont)
         self.startgame = Button(canvas.master, text="Start", command=lambda: self.startbtn(), font=menufont)
 
     def showgameoptions(self):
@@ -118,6 +132,7 @@ class GameOptions:
         self.tileamountlower.place(relx=0.4, rely=0.66, anchor=CENTER)
 
         self.back.place(relx=0.3, rely=0.8, anchor=CENTER)
+        self.namesbtn.place(relx=0.5, rely=0.8, anchor=CENTER)
         self.startgame.place(relx=0.7, rely=0.8, anchor=CENTER)
 
     def hidegameoptions(self):
@@ -139,6 +154,7 @@ class GameOptions:
         self.tileamountlower.place_forget()
 
         self.back.place_forget()
+        self.namesbtn.place_forget()
         self.startgame.place_forget()
 
     def increaseplayeramount(self):
@@ -178,9 +194,32 @@ class GameOptions:
         self.hidegameoptions()
         Mainmenu().showmainmenu()
 
+    def namewindow(self):
+        namewindow = Toplevel(canvas)
+        namewindow.title("Choose Names")
+        namewindowsize = str(int(windowsize / 3)) + "x" + str(int(windowsize / 3))
+        namewindow.geometry(str(namewindowsize))
+        self.entryfields = []
+
+        def closenamewindow():
+            Settings.playernames = ["", "", "", ""]
+            for playernames in range(self.playeramount):
+                Settings.playernames[playernames] = self.entryfields[playernames].get()
+            namewindow.destroy()
+
+        Label(namewindow, text="Change player names", font=menufont).pack()
+        for players in range(self.playeramount):
+            entryfield = Entry(namewindow, font=menufont)
+            entryfield.insert(0, self.initialnames[players])
+            self.entryfields.append(entryfield)
+            self.entryfields[players].pack()
+
+        Button(namewindow, text="Confirm", command=lambda: closenamewindow(), font=menufont).pack()
+
     def startbtn(self):
         self.hidegameoptions()
-        GameMaster(self.playeramount, self.pieceamount, self.tileamount)
+        self.inputsystem = InputSystem()
+        InputSystem.master = GameMaster(self.playeramount, self.pieceamount, self.tileamount)
         GameMaster.inmenu = False
 
 
@@ -202,5 +241,4 @@ class GameGuide:
 
 
 Mainmenu().showmainmenu()
-
 win.mainloop()

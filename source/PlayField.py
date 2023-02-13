@@ -9,7 +9,6 @@ class PlayField:
     fieldminsize = 16
     canvasminsize = 5
     border = 2
-    maxdotsize = 70
     color = "white"
 
     starthouses = [[], [], [], []]
@@ -17,13 +16,10 @@ class PlayField:
     starttileids = []
     decoration = []
 
-    def __init__(self):
-        self.fieldTiles = []
-
-    def generatefield(self, extratiles):
+    def generatefield(self, extratiles, screensize):
         canvassize = self.canvasminsize + (extratiles * 2) + self.border
-        self.dotsize = self.maxdotsize / (canvassize / 7)
-        self.canvassize = (canvassize, canvassize)
+        self.dotsize = (screensize / canvassize) - ((screensize / canvassize) / 7)
+        self.canvassize = (canvassize + 1, canvassize)
         center = (canvassize / 2) - 0.5
         rightlist = []
         leftlist = []
