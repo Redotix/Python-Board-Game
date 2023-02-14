@@ -72,8 +72,7 @@ class GameOptions:
     back = None
 
     namesbtn = None
-    initialnames = ["Blue", "Yellow", "Green", "Red"]
-    names = []
+    names = ["Blue", "Yellow", "Green", "Red"]
     entryfields = []
 
     startgame = None
@@ -203,21 +202,24 @@ class GameOptions:
         self.entryfields = []
 
         def closenamewindow():
-            Settings.playernames = ["", "", "", ""]
             for playernames in range(self.playeramount):
-                Settings.playernames[playernames] = self.entryfields[playernames].get()
+                self.names[playernames] = self.entryfields[playernames].get()
             namewindow.destroy()
 
         Label(namewindow, text="Change player names", font=menufont).pack()
         for players in range(self.playeramount):
             entryfield = Entry(namewindow, font=menufont)
-            entryfield.insert(0, self.initialnames[players])
+            entryfield.insert(0, self.names[players])
             self.entryfields.append(entryfield)
             self.entryfields[players].pack()
 
         Button(namewindow, text="Confirm", command=lambda: closenamewindow(), font=menufont).pack()
 
     def startbtn(self):
+        Settings.playernames = ["", "", "", ""]
+        for playernames in range(self.playeramount):
+            Settings.playernames[playernames] = self.names[playernames]
+
         self.hidegameoptions()
         self.inputsystem = InputSystem()
         InputSystem.master = GameMaster(self.playeramount, self.pieceamount, self.tileamount)

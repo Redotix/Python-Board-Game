@@ -22,11 +22,12 @@ class GameMaster:
     settings = None
     playingfield = PlayField()
 
+    lenghtoftravel = 0
     players = []
-    lenghtoftravel = len(playingfield.fieldTiles)
     playerchoice = 0
     piecechoice = 0
     roll = 0
+    attempt = 0
     inmenu = True
 
     def __init__(self, playeramount, pieceamount, extratiles):
@@ -34,6 +35,8 @@ class GameMaster:
         self.settings = Settings(playeramount, pieceamount, extratiles)
 
         self.playingfield.generatefield(self.settings.extratiles, windowsize)
+        self.lenghtoftravel = len(self.playingfield.fieldTiles)
+        print(self.lenghtoftravel)
         win.setworldcoordinates(0, 0, self.playingfield.canvassize[1], self.playingfield.canvassize[0])
 
         for i in range(len(self.playingfield.decoration)):
@@ -106,6 +109,10 @@ class GameMaster:
         piece = self.players[self.playerchoice].playerPieces[self.piecechoice]
 
         startingtile = self.playingfield.fieldTiles[self.playingfield.starttileids[self.playerchoice]]
+
+        if startingtile.tilestandingplayer is self.playerchoice:
+            return
+
         piece.positioninplayingfield = self.playingfield.starttileids[self.playerchoice]
         piece.tilesmoved = 1
         piece.movepiece(self.playingfield.fieldTiles[self.playingfield.starttileids[self.playerchoice]].tileCoords)
@@ -162,77 +169,77 @@ class GameMaster:
 
         # If the move results in a piece going outside the playing field or end house, the move gets skipped
         if piece.tilesmoved + roll + piece.positioninhouse > self.lenghtoftravel - 1 + self.settings.pieceamount:
-            return "Roll too big, pick a different piece or skip your turn."
-
-        # If the move results in the piece exceeding the lenght of travel needed to get into a house
-        if piece.tilesmoved + roll > self.lenghtoftravel:
-            currenttilesmoved = piece.tilesmoved
-            housedifference = self.lenghtoftravel - piece.tilesmoved
-            if piece.isinhouse is True:
-                currentposition = self.playingfield.endhouses[self.playerchoice][piece.positioninhouse]
-            else:
-                currentposition = self.playingfield.fieldTiles[piece.positioninplayingfield]
-
-            futureposition = self.playingfield.endhouses[
-                self.playerchoice][piece.positioninhouse + (roll - housedifference)]
-
-            # if the tile inside the house is already occupied, the move gets skipped
-            if futureposition.tilestandingpiece is not None:
-                self.iteratetroughfield(housedifference)
-                self.iteratetroughhouse(roll - housedifference)
-                piece.tilesmoved = currenttilesmoved
-                if piece.isinhouse is False:
-                    piece.positioninplayingfield = currentposition.tileID
-                    piece.positioninhouse = -1
-                    piece.movepiece(currentposition.tileCoords)
-                else:
-                    piece.positioninhouse = currentposition.tileID
-                    piece.movepiece(currentposition.tileCoords)
-
-                return True
-
-            self.removepiecefromhouse()
-            self.iteratetroughfield(housedifference)
-            self.iteratetroughhouse(roll - housedifference)
-            self.notifyhouseofpiece()
-            if piece.isinhouse is False:
-                self.playingfield.fieldTiles[piece.positioninplayingfield].tilestandingplayer = None
-            piece.isinhouse = True
             return False
+
+        # # If the move results in the piece exceeding the lenght of travel needed to get into a house
+        # if piece.tilesmoved + roll > self.lenghtoftravel:
+        #     currenttilesmoved = piece.tilesmoved
+        #     housedifference = self.lenghtoftravel - piece.tilesmoved
+        #     if piece.isinhouse is True:
+        #         currentposition = self.playingfield.endhouses[self.playerchoice][piece.positioninhouse]
+        #     else:
+        #         currentposition = self.playingfield.fieldTiles[piece.positioninplayingfield]
+        #
+        #     futureposition = self.playingfield.endhouses[
+        #         self.playerchoice][piece.positioninhouse + (roll - housedifference)]
+        #
+        #     # if the tile inside the house is already occupied, the move gets skipped
+        #     if futureposition.tilestandingpiece is not None:
+        #         self.iteratetroughfield(housedifference)
+        #         self.iteratetroughhouse(roll - housedifference)
+        #         piece.tilesmoved = currenttilesmoved
+        #         if piece.isinhouse is False:
+        #             piece.positioninplayingfield = currentposition.tileID
+        #             piece.positioninhouse = -1
+        #             piece.movepiece(currentposition.tileCoords)
+        #         else:
+        #             piece.positioninhouse = currentposition.tileID
+        #             piece.movepiece(currentposition.tileCoords)
+        #
+        #         return False
+        #
+        #     self.removepiecefromhouse()
+        #     self.iteratetroughfield(housedifference)
+        #     self.iteratetroughhouse(roll - housedifference)
+        #     self.notifyhouseofpiece()
+        #     if piece.isinhouse is False:
+        #         self.playingfield.fieldTiles[piece.positioninplayingfield].tilestandingplayer = None
+        #     piece.isinhouse = True
+        #     return False
 
         self.removepiecefromtile()
         difference = (piece.positioninplayingfield + roll) - (self.lenghtoftravel - 1)
         difference = max(0, difference)
-        currenttilesmoved = piece.tilesmoved
-        currentposition = self.playingfield.fieldTiles[piece.positioninplayingfield]
+        # currenttilesmoved = piece.tilesmoved
+        # currentposition = self.playingfield.fieldTiles[piece.positioninplayingfield]
+        #
+        # if difference > 0:
+        #     futureposition = self.playingfield.fieldTiles[difference - 1]
+        #
+        # else:
+        #     futureposition = self.playingfield.fieldTiles[piece.positioninplayingfield + roll]
 
-        if difference > 0:
-            futureposition = self.playingfield.fieldTiles[difference - 1]
-
-        else:
-            futureposition = self.playingfield.fieldTiles[piece.positioninplayingfield + roll]
-
-        # if the tile inside the playing field is occupied by a piece of the same player, the move gets skipped
-        if futureposition.tilestandingplayer == self.playerchoice:
-            self.iteratetroughfield(roll - difference)
-            if difference > 0:
-                piece.positioninplayingfield = -1
-                self.iteratetroughfield(difference)
-            piece.tilesmoved = currenttilesmoved
-            piece.positioninplayingfield = currentposition.tileID
-            piece.movepiece(currentposition.tileCoords)
-            self.notifytileofpeice()
-            return False
-
-        # if the tile inside the playing field is occupied by a piece of another player, the peice gets kicked out
-        elif futureposition.tilestandingplayer != self.playerchoice and futureposition.tilestandingplayer is not None:
-            self.iteratetroughfield(roll - difference)
-            if difference > 0:
-                piece.positioninplayingfield = -1
-                self.iteratetroughfield(difference)
-            self.kickpiece(futureposition.tilestandingplayer, futureposition.tilestandingpiece)
-            self.notifytileofpeice()
-            return True
+        # # if the tile inside the playing field is occupied by a piece of the same player, the move gets skipped
+        # if futureposition.tilestandingplayer == self.playerchoice:
+        #     self.iteratetroughfield(roll - difference)
+        #     if difference > 0:
+        #         piece.positioninplayingfield = -1
+        #         self.iteratetroughfield(difference)
+        #     piece.tilesmoved = currenttilesmoved
+        #     piece.positioninplayingfield = currentposition.tileID
+        #     piece.movepiece(currentposition.tileCoords)
+        #     self.notifytileofpeice()
+        #     return False
+        #
+        # # if the tile inside the playing field is occupied by a piece of another player, the peice gets kicked out
+        # elif futureposition.tilestandingplayer != self.playerchoice and futureposition.tilestandingplayer is not None:
+        #     self.iteratetroughfield(roll - difference)
+        #     if difference > 0:
+        #         piece.positioninplayingfield = -1
+        #         self.iteratetroughfield(difference)
+        #     self.kickpiece(futureposition.tilestandingplayer, futureposition.tilestandingpiece)
+        #     self.notifytileofpeice()
+        #     return True
 
         self.iteratetroughfield(roll - difference)
         if difference > 0:
@@ -241,117 +248,3 @@ class GameMaster:
 
         self.notifytileofpeice()
         return True
-
-
-# def printstate():
-#     global playerchoice
-#     global piecechoice
-#
-#     print("Its player ", playerchoice, "'s turn.")
-#     print("Piece number ", piecechoice, " is chosen")
-#
-#
-# def cyclepiecesright(pieceamount):
-#     global piecechoice
-#
-#     if piecechoice + 1 > pieceamount - 1:
-#         piecechoice = 0
-#     else:
-#         piecechoice += 1
-#
-#     printstate()
-#
-#
-# def cyclepiecesleft(pieceamount):
-#     global piecechoice
-#
-#     if piecechoice - 1 < 0:
-#         piecechoice = pieceamount - 1
-#     else:
-#         piecechoice -= 1
-#
-#     printstate()
-#
-#
-# def cycleplayers(playeramount):
-#     global playerchoice
-#
-#     if playerchoice + 1 > playeramount - 1:
-#         playerchoice = 0
-#     else:
-#         playerchoice += 1
-#
-#     printstate()
-#
-#
-# def skipturn(playeramount):
-#     cycleplayers(playeramount)
-#     print("You skipped your turn")
-#
-#
-# def moveattempt(playeramount):
-#     global rollnum
-#     global attempt
-#     piecesonboard = None
-#
-#     piece = players[playerchoice].playerPieces[piecechoice]
-#
-#     if rollnum == 0:
-#         rollnum = random.randrange(1, 7)
-#
-#     for i in range(10):
-#         print()
-#     print("Rolled: ", rollnum)
-#
-#     for i in range(len(players[playerchoice].playerPieces)):
-#         if players[playerchoice].playerPieces[i].positioninplayingfield is not None:
-#             piecesonboard = True
-#         elif piecesonboard is not True:
-#             piecesonboard = False
-#
-#     print("piece on board is ", piecesonboard)
-#
-#     if piecesonboard is False and rollnum == 6:
-#         initiatepiece()
-#         cycleplayers(playeramount)
-#         rollnum = 0
-#         attempt = 0
-#         print("Placed piece of playing field")
-#         return
-#
-#     elif piecesonboard is False and rollnum != 6:
-#         if attempt + 1 > 2:
-#             rollnum = 0
-#             attempt = 0
-#             cycleplayers(playeramount)
-#             print("Out of attempts, turn skipped")
-#         else:
-#             rollnum = 0
-#             attempt += 1
-#             print("Didnt throw 6, you have another attempt")
-#         return
-#
-#     if piece.positioninplayingfield is None and rollnum == 6:
-#         initiatepiece()
-#         cycleplayers(playeramount)
-#         rollnum = 0
-#         print("Placed piece of playing field")
-#         return
-#
-#     elif piece.positioninplayingfield is None and rollnum != 6:
-#         print("Didnt roll a 6, choose a different piece or skip turn")
-#         return
-#
-#     answer = performmovement(rollnum)
-#     if answer is True:
-#         cycleplayers(playeramount)
-#         rollnum = 0
-#         print("Moved piece")
-#         return
-#     print("Piece cant move there, choose a different piece or skip turn")
-#
-#
-# win.onkey(lambda: cyclepiecesleft(settings.pieceamount), "Left")
-# win.onkey(lambda: cyclepiecesright(settings.pieceamount), "Right")
-# win.onkey(lambda: moveattempt(settings.playeramount), "Return")
-# win.onkey(lambda: skipturn(settings.playeramount), "s")

@@ -60,8 +60,9 @@ class InputSystem:
         print(self.master.piecechoice)
 
     def roll(self):
-        rollnum = random.randrange(1, 7)
-        self.master.roll = rollnum
+        if self.master.roll == 0:
+            # self.master.roll = random.randrange(1, 7)
+            self.master.roll = 6
 
     def cycleplayers(self):
         if self.master.playerchoice + 1 > self.master.settings.playeramount - 1:
@@ -80,7 +81,7 @@ class InputSystem:
                 case "Right":
                     self.cyclepiecesright()
                 case "Return":
-                    self.cycleplayers()
+                    self.moveattempt()
                 case "Space":
                     self.roll()
 
@@ -88,6 +89,61 @@ class InputSystem:
                                  self.master.settings.playernames[self.master.playerchoice],
                                  self.master.piecechoice, self.master.roll, self.gamefont[1],
                                  self.master.settings.playernames)
+
+    def moveattempt(self):
+        if self.master.roll != 0:
+            piecesonboard = None
+
+            piece = self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice]
+
+            for i in range(len(self.master.players[self.master.playerchoice].playerPieces)):
+                if self.master.players[self.master.playerchoice].playerPieces[i].positioninplayingfield is not None:
+                    piecesonboard = True
+                elif piecesonboard is not True:
+                    piecesonboard = False
+
+            print("piece on board is ", piecesonboard)
+
+            if piecesonboard is False and self.master.roll == 6:
+                self.master.initiatepiece()
+                self.cycleplayers()
+                self.master.roll = 0
+                self.master.attempt = 0
+                print("Placed piece of playing field")
+                return
+
+            elif piecesonboard is False and self.master.roll != 6:
+                if self.master.attempt + 1 > 2:
+                    self.master.roll = 0
+                    self.master.attempt = 0
+                    self.cycleplayers()
+                    print("Out of attempts, turn skipped")
+                else:
+                    self.master.roll = 0
+                    self.master.attempt += 1
+                    print("Didnt throw 6, you have another attempt")
+                return
+
+            if piece.positioninplayingfield is None and self.master.roll == 6:
+                self.master.initiatepiece()
+                self.cycleplayers()
+                self.master.roll = 0
+                print("Placed piece of playing field")
+                return
+
+            elif piece.positioninplayingfield is None and self.master.roll != 6:
+                print("Didnt roll a 6, choose a different piece or skip turn")
+                return
+
+            if self.master.performmovement(self.master.roll) is True:
+                self.cycleplayers()
+                self.master.roll = 0
+                print("Moved piece")
+                return
+            if self.master.performmovement(self.master.roll) is False:
+                print("Piece cant move there, choose a different piece or skip turn")
+                return
+            print("something went wrong")
 
 
 # inputsystem = InputSystem()

@@ -30,7 +30,8 @@ class Piece:
     # Moves the piece to the input coordinate tuple.
     def movepiece(self, coords):
         self.uniqueTurt.setpos(offsettocenter(coords))
-
+        self.position = coords
+        
     # def getpieceid(self, dummy, dummy2):
     #     print(self.piecenumber, self.position)
     #     return self.position
