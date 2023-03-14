@@ -98,4 +98,3 @@ class PlayField:
             self.starttileids.append(self.fieldTiles[startingtilesdivision * 2].tileID)
             self.starttileids.append(self.fieldTiles[startingtilesdivision * 1].tileID)
             self.starttileids.append(self.fieldTiles[startingtilesdivision * 3].tileID)
-

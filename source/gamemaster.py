@@ -9,13 +9,20 @@ canvas = win.getcanvas()
 root = canvas.winfo_toplevel()
 root.resizable(False, False)
 windowsize = canvas.winfo_screenheight() - 210
-# windowsize = 800 - 210
 win.setup(windowsize, windowsize + 90)
 t.colormode(255)
 bgcolor = (128, 128, 128)
 win.bgcolor(bgcolor)
 
 fontsizefactor = 40
+gamefont = ('Arial', int(windowsize / fontsizefactor), 'normal')
+
+
+def recreatescreen():
+    t.Screen().clear()
+    t.colormode(255)
+    win.bgcolor(bgcolor)
+
 
 GAMESTATE_AWAIT = -1
 GAMESTATE_READY = 0
@@ -27,12 +34,27 @@ MOVESTATE_SUCCESS = 0
 MOVESTATE_OUTOFBOUNDS = 1
 MOVESTATE_TILEOCCUPIED = 2
 
-gamefont = ('Arial', int(windowsize / fontsizefactor), 'normal')
+
+def resetstate():
+    GameMaster.settings = None
+    GameMaster.playingfield = None
+
+    GameMaster.currentGameState = 1
+
+    GameMaster.lenghtoftravel = 0
+    GameMaster.players = []
+    GameMaster.playerchoice = 0
+    GameMaster.piecechoice = 0
+    GameMaster.roll = 0
+    GameMaster.attempt = 0
+    GameMaster.inmenu = True
+
+    GameMaster.statetext = ""
 
 
 class GameMaster:
     settings = None
-    playingfield = PlayField()
+    playingfield = None
 
     currentGameState = 1
 
@@ -44,13 +66,15 @@ class GameMaster:
     attempt = 0
     inmenu = True
 
+    statetext = ""
+
     def __init__(self, playeramount, pieceamount, extratiles):
         t.tracer(False)
         self.settings = Settings(playeramount, pieceamount, extratiles)
+        self.playingfield = PlayField()
 
         self.playingfield.generatefield(self.settings.extratiles, windowsize)
         self.lenghtoftravel = len(self.playingfield.fieldTiles)
-        print(self.lenghtoftravel)
         win.setworldcoordinates(
             0, 0, self.playingfield.canvassize[1], self.playingfield.canvassize[0])
 
@@ -91,11 +115,8 @@ class GameMaster:
 
         Renderer().inithighlight(self.playingfield.dotsize)
 
-        Renderer().refreshui(self.playingfield.canvassize[1],
-                             self.settings.playernames[self.playerchoice],
-                             self.piecechoice, self.roll, int(
-                                 windowsize / fontsizefactor),
-                             Settings.playernames)
+        Renderer().refreshui(self.playingfield.canvassize[1], self.settings.playernames[self.playerchoice], self.piecechoice, self.roll, int(windowsize / fontsizefactor), Settings.playernames,
+                             self.statetext)
         position = self.players[self.playerchoice].playerPieces[self.piecechoice].position
         Renderer().highlight((position[0] + 0.5, position[1] + 0.5))
 
@@ -280,4 +301,4 @@ class GameMaster:
         return MOVESTATE_SUCCESS
 
     def refreshui(self):
-        Renderer().refreshui(self.playingfield.canvassize[1], self.settings.playernames[self.playerchoice], self.piecechoice, self.roll, gamefont[1], self.settings.playernames)
+        Renderer().refreshui(self.playingfield.canvassize[1], self.settings.playernames[self.playerchoice], self.piecechoice, self.roll, gamefont[1], self.settings.playernames, self.statetext)

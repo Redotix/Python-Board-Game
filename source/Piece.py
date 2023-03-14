@@ -7,7 +7,7 @@ class Piece:
     uniqueTurt = None
     piecenumber = None
     positioninplayingfield = None
-    positioninhouse = - 1
+    positioninhouse = -1
     tilesmoved = 0
     isinhouse = False
 

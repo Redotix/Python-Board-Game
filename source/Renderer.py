@@ -85,7 +85,7 @@ class Renderer:
     def hidehighlight(self):
         self.clickselectTurtle.hideturtle()
 
-    def refreshui(self, canvassize, playername, piecechosen, roll, fontsize, namelist):
+    def refreshui(self, canvassize, playername, piecechosen, roll, fontsize, namelist, statetext):
         t.tracer(False)
         font = ('Arial', fontsize, 'normal')
         namefont = ('Arial', fontsize, 'bold')
@@ -96,18 +96,22 @@ class Renderer:
 
         self.writingTurtle.goto(canvassize - 1 - 0.37, canvassize - 1 + 0.25)
         self.writingTurtle.color("black")
-        self.writingTurtle.write(namelist[0], False, "right", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.write(namelist[0], False, "right", namefont)
         self.writingTurtle.goto(1 + 0.37, 0 + 0.25)
-        self.writingTurtle.write(namelist[1], False, "left", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.write(namelist[1], False, "left", namefont)
         self.writingTurtle.goto(canvassize - 1 - 0.37, 0 + 0.25)
-        self.writingTurtle.write(namelist[2], False, "right", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.write(namelist[2], False, "right", namefont)
         self.writingTurtle.goto(1 + 0.37, canvassize - 1 + 0.25)
-        self.writingTurtle.write(namelist[3], False, "left", ('Arial', fontsize, 'bold'))
+        self.writingTurtle.write(namelist[3], False, "left", namefont)
+
+        self.writingTurtle.goto(canvassize / 2, 0.25)
+        self.writingTurtle.write(statetext, False, "center", font)
 
         self.writingTurtle.goto(0, canvassize)
-        self.writingTurtle.write(f"  {playername}'s Turn", False, "left", ('Arial', fontsize, 'normal'))
+        self.writingTurtle.write(f"  Hrá {playername}", False, "left", font)
+
         self.writingTurtle.goto(canvassize / 2, canvassize)
-        self.writingTurtle.write(f"Piece {piecechosen + 1} chosen", False, "center", ('Arial', fontsize, 'normal'))
+        self.writingTurtle.write(f"Figúrka {piecechosen + 1} zvolená", False, "center", font)
         self.writingTurtle.goto(canvassize, canvassize)
-        self.writingTurtle.write(f"You Rolled: {roll}  ", False, "right", ('Arial', fontsize, 'normal'))
+        self.writingTurtle.write(f"Hodil si: {roll}  ", False, "right", font)
         t.tracer(True)

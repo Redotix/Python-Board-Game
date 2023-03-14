@@ -3,31 +3,47 @@ from tkinter import *
 
 
 class InputSystem:
+    rollbtn = None
+    movebtn = None
+    resultscreen = None
+
     master = None
     # master = GameMaster(4, 4, 3)
     # master.inmenu = False
 
-    def __init__(self):
+    def __init__(self, resultscreen):
         win.onkey(lambda key="Return": self.inputhandler(key), "Return")
         win.onkey(lambda key="Space": self.inputhandler(key), "space")
         win.onkey(lambda key="Left": self.inputhandler(key), "Left")
-        win.onkey(lambda key="1": self.inputhandler(key), "1")
-        win.onkey(lambda key="2": self.inputhandler(key), "2")
-        win.onkey(lambda key="3": self.inputhandler(key), "3")
-        win.onkey(lambda key="4": self.inputhandler(key), "4")
-        win.onkey(lambda key="5": self.inputhandler(key), "5")
-        win.onkey(lambda key="6": self.inputhandler(key), "6")
-        win.onkey(lambda key="p": self.inputhandler(key), "p")
-        rollbtn = Button(canvas.master, text="Roll", command=lambda key="Space": self.inputhandler(key),
-                         font=gamefont)
-        movebtn = Button(canvas.master, text="Move", command=lambda key="Return": self.inputhandler(key),
-                         font=gamefont)
-        rollbtn.place(relx=0.7, rely=0.05, anchor=CENTER)
-        movebtn.place(relx=0.3, rely=0.05, anchor=CENTER)
+        win.onkey(lambda key="Right": self.inputhandler(key), "Right")
+        self.rollbtn = Button(canvas.master, text="Hoď", command=lambda key="Space": self.inputhandler(key), font=gamefont)
+        self.movebtn = Button(canvas.master, text="Choď", command=lambda key="Return": self.inputhandler(key), font=gamefont)
+        self.rollbtn.place(relx=0.7, rely=0.05, anchor=CENTER)
+        self.movebtn.place(relx=0.3, rely=0.05, anchor=CENTER)
+        self.resultscreen = resultscreen
 
         win.onclick(self.mouseselectpiece)
 
         win.listen()
+
+    def inputhandler(self, key):
+        if self.master.inmenu is False and self.master.currentGameState != GAMESTATE_AWAIT:
+            match key:
+                case "Left":
+                    self.cyclepiecesleft()
+                case "Right":
+                    self.cyclepiecesright()
+                case "Return":
+                    if self.master.roll == 0:
+                        return
+
+                    self.moveattempt(self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice])
+                case "Space":
+                    self.roll()
+                    if self.master.currentGameState == GAMESTATE_GETPIECEOUT:
+                        self.moveattempt(self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice])
+
+        self.master.refreshui()
 
     def mouseselectpiece(self, x, y):
         position = (int(x), int(y))
@@ -76,13 +92,25 @@ class InputSystem:
         if self.master.currentGameState != GAMESTATE_GETPIECEOUT:
             self.master.currentGameState = GAMESTATE_MOVE
 
+    def gotoresultscreen(self, victor):
+        recreatescreen()
+        resetstate()
+        self.movebtn.place_forget()
+        self.rollbtn.place_forget()
+        self.resultscreen.victor = victor
+        self.resultscreen.showresultscreen()
+
     def cycleplayers(self):
-        # player = self.master.players[self.master.playerchoice]
-        #
-        # for i in player.playerPieces:
-        #     if i.isinhouse is False:
-        #         break
-        #     print(f'{self.master.settings.playernames[self.master.playerchoice]} Won!')
+        haswinner = True
+        player = self.master.players[self.master.playerchoice]
+        for i in player.playerPieces:
+            if i.isinhouse is False:
+                haswinner = False
+                break
+
+        if haswinner is True:
+            print(f' {self.master.settings.playernames[self.master.playerchoice]} won!')
+            self.gotoresultscreen(self.master.settings.playernames[self.master.playerchoice])
 
         if self.master.playerchoice + 1 > self.master.settings.playeramount - 1:
             self.master.playerchoice = 0
@@ -100,40 +128,6 @@ class InputSystem:
         pos = self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice].position
         Renderer().highlight((pos[0] + 0.5, pos[1] + 0.5))
 
-    def inputhandler(self, key):
-        if self.master.inmenu is False and self.master.currentGameState != GAMESTATE_AWAIT:
-            match key:
-                case "Left":
-                    self.cyclepiecesleft()
-                case "Right":
-                    self.cyclepiecesright()
-                case "Return":
-                    if self.master.roll == 0:
-                        return
-
-                    self.moveattempt(self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice])
-                case "Space":
-                    self.roll()
-                    if self.master.currentGameState == GAMESTATE_GETPIECEOUT:
-                        self.moveattempt(self.master.players[self.master.playerchoice].playerPieces[self.master.piecechoice])
-
-                case "1":
-                    self.debugroll(1)
-                case "2":
-                    self.debugroll(2)
-                case "3":
-                    self.debugroll(3)
-                case "4":
-                    self.debugroll(4)
-                case "5":
-                    self.debugroll(5)
-                case "6":
-                    self.debugroll(6)
-                case "p":
-                    self.cycleplayers()
-        
-        self.master.refreshui()
-
     def ispieceonboard(self):
         for i in range(len(self.master.players[self.master.playerchoice].playerPieces)):
             if self.master.players[self.master.playerchoice].playerPieces[i].positioninplayingfield is not None:
@@ -150,7 +144,7 @@ class InputSystem:
         if piece.positioninhouse + roll < self.master.settings.pieceamount:
             print(f'PIECE CAN STILL TRAVEL IN HOUSES {piece.positioninhouse + roll} LESS THAN {self.master.settings.pieceamount}')
             return True
-        if piece.tilesmoved + roll + piece.positioninhouse < self.master.lenghtoftravel - 1 + self.master.settings.pieceamount:
+        if piece.tilesmoved + roll + piece.positioninhouse <= self.master.lenghtoftravel - 1 + self.master.settings.pieceamount:
             return True
 
         return False
@@ -171,18 +165,21 @@ class InputSystem:
             if self.master.roll == 6:
                 self.master.initiatepiece()
                 self.cycleplayers()
+                self.master.statetext = ""
 
             elif self.master.attempt + 1 > 2:
                 self.cycleplayers()
-
+                self.master.statetext = "Došli ti pokusi"
             else:
                 self.master.attempt += 1
+                self.master.statetext = "Máš dalšlí pokus"
             return
 
         elif piece.positioninplayingfield is None and self.master.currentGameState == GAMESTATE_MOVE:
             if self.master.roll == 6:
                 if self.master.initiatepiece():
                     self.cycleplayers()
+                    self.master.statetext = ""
                     return
                 self.master.currentGameState = GAMESTATE_MOVE
                 return
@@ -192,9 +189,11 @@ class InputSystem:
 
         if availablemoves <= 0:
             self.cycleplayers()
+            self.master.statetext = "0 možných pohybov"
             return
 
         if not self.canpiecemove(self.master.roll, piece):
+            self.master.statetext = "Neplatný pohyb"
             return
         
         result = self.master.performmovement(self.master.roll)
@@ -202,14 +201,22 @@ class InputSystem:
 
         match result:
             case 0:  # MOVESTATE_SUCCESS
+                self.master.statetext = ""
                 self.cycleplayers()
             case 1:  # MOVESTATE_OUTOFBOUNDS
-                self.cycleplayers()
+                if availablemoves <= 1:
+                    self.master.statetext = "Neplatný pohyb, 0 možných pohybov"
+                    self.cycleplayers()
+                    return
+                self.master.statetext = "Neplatný pohyb"
+                self.master.currentGameState = GAMESTATE_MOVE
             case 2:  # MOVESTATE_TILEOCCUPIED
                 if availablemoves <= 1:
+                    self.master.statetext = "Neplatný pohyb, 0 možných pohybov"
                     self.cycleplayers()
                     return
                 self.master.currentGameState = GAMESTATE_MOVE
+                self.master.statetext = "Neplatný pohyb"
 
 # inputsystem = InputSystem()
 # win.mainloop()

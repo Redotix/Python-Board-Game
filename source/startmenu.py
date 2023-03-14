@@ -20,13 +20,13 @@ class Mainmenu:
     gamename = None
 
     def __init__(self):
-        self.start = Button(canvas.master, text="Start Game", width=int(windowsize / 50),
+        self.start = Button(canvas.master, text="Hrať", width=int(windowsize / 50),
                             command=lambda: self.startbtn(), font=menufont)
-        self.leave = Button(canvas.master, text="Exit Game", width=int(windowsize / 50),
+        self.leave = Button(canvas.master, text="Koniec", width=int(windowsize / 50),
                             command=lambda: exitgame(), font=menufont)
-        self.gameguide = Button(canvas.master, text="Game Guide", width=int(windowsize / 50),
+        self.gameguide = Button(canvas.master, text="Ako hrať", width=int(windowsize / 50),
                                 command=lambda: self.gameguidebtn(), font=menufont)
-        self.gamename = Label(text="Clovece Nehnevaj Sa!", font=titlefont, bg=rgbtohex(bgcolor))
+        self.gamename = Label(text="Cloveče Nehnevaj Sa!", font=titlefont, bg=rgbtohex(bgcolor))
 
     def showmainmenu(self):
         self.start.place(relx=0.5, rely=0.42, anchor=CENTER)
@@ -42,11 +42,11 @@ class Mainmenu:
 
     def startbtn(self):
         self.hidemainmenu()
-        GameOptions().showgameoptions()
+        options.showgameoptions()
 
     def gameguidebtn(self):
         self.hidemainmenu()
-        GameGuide().showgameguide()
+        guide.showgameguide()
 
 
 class GameOptions:
@@ -72,7 +72,7 @@ class GameOptions:
     back = None
 
     namesbtn = None
-    names = ["Blue", "Yellow", "Green", "Red"]
+    names = ["Modrý", "Žltý", "Zelený", "Červený"]
     entryfields = []
 
     startgame = None
@@ -80,10 +80,10 @@ class GameOptions:
     inputsystem = None
 
     def __init__(self):
-        self.toptext = Label(canvas.master, text="Choose Game settings", font=menufont, bg=rgbtohex(bgcolor))
+        self.toptext = Label(canvas.master, text="Zvol nastavenia hry", font=menufont, bg=rgbtohex(bgcolor))
 
         # Player amount widgets
-        self.playeramountlabel = Label(canvas.master, text="Amount of players:", font=menufont, bg=rgbtohex(bgcolor))
+        self.playeramountlabel = Label(canvas.master, text="Počet hráčov:", font=menufont, bg=rgbtohex(bgcolor))
         self.playeramounthigher = Button(canvas.master, text=">",
                                          command=lambda: self.increaseplayeramount(), font=menufont)
 
@@ -92,7 +92,7 @@ class GameOptions:
                                         command=lambda: self.decreaseplayeramount(), font=menufont)
 
         # Piece amount widgets
-        self.pieceamountlabel = Label(canvas.master, text="Amount of pieces:", font=menufont, bg=rgbtohex(bgcolor))
+        self.pieceamountlabel = Label(canvas.master, text="Počet figúrok:", font=menufont, bg=rgbtohex(bgcolor))
         self.pieceamounthigher = Button(canvas.master, text=">",
                                         command=lambda: self.increasepieceamount(), font=menufont)
 
@@ -101,7 +101,7 @@ class GameOptions:
                                        command=lambda: self.decreasepieceamount(), font=menufont)
 
         # Tile amount widgets
-        self.tileamountlabel = Label(canvas.master, text="Amount of extra tiles:", font=menufont, bg=rgbtohex(bgcolor))
+        self.tileamountlabel = Label(canvas.master, text="Veľkosť hernej plochy:", font=menufont, bg=rgbtohex(bgcolor))
         self.tileamounthigher = Button(canvas.master, text=">",
                                        command=lambda: self.increasetileamount(), font=menufont)
 
@@ -109,9 +109,9 @@ class GameOptions:
         self.tileamountlower = Button(canvas.master, text="<",
                                       command=lambda: self.decreasetileamount(), font=menufont)
 
-        self.back = Button(canvas.master, text="Back", command=lambda: self.backbtn(), font=menufont)
-        self.namesbtn = Button(canvas.master, text="Choose Names", command=lambda: self.namewindow(), font=menufont)
-        self.startgame = Button(canvas.master, text="Start", command=lambda: self.startbtn(), font=menufont)
+        self.back = Button(canvas.master, text="Späť", command=lambda: self.backbtn(), font=menufont)
+        self.namesbtn = Button(canvas.master, text="Zvoľ mená", command=lambda: self.namewindow(), font=menufont)
+        self.startgame = Button(canvas.master, text="Hrať", command=lambda: self.startbtn(), font=menufont)
 
     def showgameoptions(self):
         self.toptext.place(relx=0.5, rely=0.3, anchor=CENTER)
@@ -192,11 +192,11 @@ class GameOptions:
 
     def backbtn(self):
         self.hidegameoptions()
-        Mainmenu().showmainmenu()
+        main.showmainmenu()
 
     def namewindow(self):
         namewindow = Toplevel(canvas)
-        namewindow.title("Choose Names")
+        namewindow.title("Zvoľ mená")
         namewindowsize = str(int(windowsize / 3)) + "x" + str(int(windowsize / 3))
         namewindow.geometry(str(namewindowsize))
         self.entryfields = []
@@ -206,14 +206,14 @@ class GameOptions:
                 self.names[playernames] = self.entryfields[playernames].get()
             namewindow.destroy()
 
-        Label(namewindow, text="Change player names", font=menufont).pack()
+        Label(namewindow, text="Zvoľ mená hráčov", font=menufont).pack()
         for players in range(self.playeramount):
             entryfield = Entry(namewindow, font=menufont)
             entryfield.insert(0, self.names[players])
             self.entryfields.append(entryfield)
             self.entryfields[players].pack()
 
-        Button(namewindow, text="Confirm", command=lambda: closenamewindow(), font=menufont).pack()
+        Button(namewindow, text="Potvrdiť", command=lambda: closenamewindow(), font=menufont).pack()
 
     def startbtn(self):
         Settings.playernames = ["", "", "", ""]
@@ -221,8 +221,8 @@ class GameOptions:
             Settings.playernames[playernames] = self.names[playernames]
 
         self.hidegameoptions()
-        self.inputsystem = InputSystem()
-        InputSystem.master = GameMaster(self.playeramount, self.pieceamount, self.tileamount)
+        self.inputsystem = InputSystem(ResultScreen())
+        self.inputsystem.master = GameMaster(self.playeramount, self.pieceamount, self.tileamount)
         GameMaster.inmenu = False
 
 
@@ -230,7 +230,7 @@ class GameGuide:
     back = None
 
     def __init__(self):
-        self.back = Button(canvas.master, text="Back", command=lambda: self.backbtn(), font=menufont)
+        self.back = Button(canvas.master, text="Späť", command=lambda: self.backbtn(), font=menufont)
 
     def showgameguide(self):
         self.back.place(relx=0.3, rely=0.8, anchor=CENTER)
@@ -240,8 +240,36 @@ class GameGuide:
 
     def backbtn(self):
         self.hidegameguide()
-        Mainmenu().showmainmenu()
+        main.showmainmenu()
 
+
+class ResultScreen:
+    title = None
+    back = None
+    victor = None
+
+    def __init__(self):
+        self.title = Label(text="X vyhral!", font=titlefont, bg=rgbtohex(bgcolor))
+        self.back = Button(canvas.master, text="Späť do hlavného menu", command=lambda: self.backbtn(), font=menufont)
+
+    def showresultscreen(self):
+        self.title.config(text=f'{self.victor} vyhral!')
+        self.title.place(relx=0.5, rely=0.3, anchor=CENTER)
+        self.back.place(relx=0.5, rely=0.8, anchor=CENTER)
+
+    def hideresultscreen(self):
+        self.title.place_forget()
+        self.back.place_forget()
+
+    def backbtn(self):
+        self.hideresultscreen()
+        main.showmainmenu()
+
+
+main = Mainmenu()
+options = GameOptions()
+guide = GameGuide()
+result = ResultScreen()
 
 Mainmenu().showmainmenu()
 win.mainloop()
